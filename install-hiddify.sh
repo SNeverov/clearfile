@@ -1,14 +1,21 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
-echo "Обновляем систему и устанавливаем зависимости..."
-apt update && apt install -y curl sudo gnupg apt-transport-https ca-certificates software-properties-common
+echo "[*] Обновление системы..."
+apt update && apt upgrade -y
 
-echo "Устанавливаем Docker..."
-curl -fsSL https://get.docker.com | sh
-systemctl enable docker
-systemctl start docker
+echo "[*] Установка зависимостей..."
+apt install -y curl wget sudo git socat cron netcat unzip bash apt-transport-https ca-certificates gnupg lsb-release
 
-echo "Загружаем и запускаем установку Hiddify Next..."
-curl -L -o install.sh https://raw.githubusercontent.com/hiddify/hiddify-config/main/install.sh
-chmod +x install.sh
-./install.sh
+echo "[*] Установка Docker..."
+curl -fsSL https://get.docker.com | bash
+
+echo "[*] Установка Docker Compose..."
+DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}
+mkdir -p $DOCKER_CONFIG/cli-plugins
+curl -SL https://github.com/docker/compose/releases/download/v2.23.3/docker-compose-linux-x86_64 -o $DOCKER_CONFIG/cli-plugins/docker-compose
+chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
+
+echo "[*] Загрузка и установка Hiddify..."
+bash -c "$(curl -L https://raw.githubusercontent.com/hiddify/hiddify-config/main/install.sh)"
+
+echo "[*] Установка завершена. Перезагрузите сервер или дождитесь запуска панели."
